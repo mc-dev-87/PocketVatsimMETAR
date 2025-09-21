@@ -7,5 +7,21 @@ Features
 - right-click on the app to drag it
 - press the Esc key to close the app
 
+Supported Airports
+- EPWA
+- EPMO
+- EPLL
+- EPRA
+- EPKK
+- EPKT
+- EPPO
+- EPWR
+- EPGD
+- EPBY
+- EPSC
+- EPSY
+- EPLB
+- EPRZ
+
 How to Use
 - download the latest .exe file from the Releases page
