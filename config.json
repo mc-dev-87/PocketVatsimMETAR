@@ -1,0 +1,17 @@
+{
+    "ICAO_GROUPS": [
+        ["EPWA", "EPMO", "EPLL", "EPRA"],
+        ["EPKK", "EPKT"],
+        ["EPPO", "EPWR"],
+        ["EPGD", "EPBY"],
+        ["EPSC", "EPSY", "EPLB", "EPRZ"]
+    ],
+    "CAT_COLORS": {
+        "VFR": "#106300",
+        "SVFR": "#FFB800",
+        "IFR": "#FF0000",
+        "None": "#404040"
+    },
+    "FONT_FAMILY": "Courier",
+    "FONT_SIZE": 8
+}
