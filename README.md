@@ -27,4 +27,4 @@ How to Use
 - download the latest .exe file from the Releases page
 
 Security Notice
-This application is signed with a self-signed certificate to verify its authenticity. When you first run the app, Windows may display a SmartScreen warning. You can safely bypass this warning by clicking "More info" and then "Run anyway".
+- This application is signed with a self-signed certificate to verify its authenticity. When you first run the app, Windows may display a SmartScreen warning. You can safely bypass this warning by clicking "More info" and then "Run anyway".
