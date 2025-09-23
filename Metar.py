@@ -7,6 +7,7 @@ import re
 import json
 import os
 
+
 def load_config(filename: str) -> Dict[str, Any]:
     default_config = {
         "ICAO_GROUPS": [
@@ -31,6 +32,7 @@ def load_config(filename: str) -> Dict[str, Any]:
         pass
     return default_config
 
+
 config = load_config("config.json")
 
 ICAO_GROUPS: List[List[str]] = config["ICAO_GROUPS"]
@@ -52,6 +54,7 @@ VIS_FRACT_SM_REGEX = re.compile(r'^(\d+)?\s?(\d)/(\d)SM$')
 
 PLACEHOLDER = "(no data)"
 
+
 def fetch_metars(icaos: List[str]) -> Dict[str, str]:
     out: Dict[str, str] = {}
     if not icaos:
@@ -70,6 +73,7 @@ def fetch_metars(icaos: List[str]) -> Dict[str, str]:
     except Exception:
         pass
     return out
+
 
 def fetch_atis_codes(icaos: List[str]) -> Dict[str, str]:
     codes: Dict[str, str] = {}
@@ -105,6 +109,7 @@ def fetch_atis_codes(icaos: List[str]) -> Dict[str, str]:
         pass
     return codes
 
+
 def parse_wind_qnh(metar_line: str, icao: str) -> Optional[Tuple[str, str]]:
     if not metar_line:
         return None
@@ -116,6 +121,7 @@ def parse_wind_qnh(metar_line: str, icao: str) -> Optional[Tuple[str, str]]:
     qnh = next((p for p in space if QNH_Q_REGEX.match(p)), None)
     return (wind, qnh) if wind and qnh else None
 
+
 def parse_visibility_and_ceiling(metar_line: str, icao: str) -> Tuple[Optional[int], Optional[int]]:
     if not metar_line or not metar_line.startswith(icao):
         return (None, None)
@@ -124,13 +130,9 @@ def parse_visibility_and_ceiling(metar_line: str, icao: str) -> Tuple[Optional[i
     ceiling_ft: Optional[int] = None
 
     if "CAVOK" in parts:
-        vis_m, ceiling_ft = 10000, 5000
-    if any(tok in parts for tok in ("NCD", "NSC")) and ceiling_ft is None:
-        ceiling_ft = 5000
+        return (10000, 5000)
 
     for p in parts:
-        if p == "CAVOK":
-            continue
         if p.isdigit() and len(p) in (4, 5):
             vis_m = int(p)
             break
@@ -151,14 +153,16 @@ def parse_visibility_and_ceiling(metar_line: str, icao: str) -> Tuple[Optional[i
             break
 
     for p in parts:
-        if p.startswith(("BKN", "OVC")) and len(p) >= 5 and p[3:6].isdigit():
+        if p.startswith(("BKN", "OVC", "VV")) and len(p) >= 5 and p[3:6].isdigit():
             hft = int(p[3:6]) * 100
             ceiling_ft = hft if ceiling_ft is None else min(ceiling_ft, hft)
-        elif p.startswith("VV") and len(p) >= 4 and p[2:5].isdigit():
-            hft = int(p[2:5]) * 100
-            ceiling_ft = hft if ceiling_ft is None else min(ceiling_ft, hft)
+
+    if ceiling_ft is None:
+        if not any(p.startswith(("BKN", "OVC", "VV")) for p in parts):
+            ceiling_ft = 5000
 
     return (vis_m, ceiling_ft)
+
 
 def classify_flight_category(vis_m: Optional[int], ceiling_ft: Optional[int]) -> Optional[str]:
     if vis_m is None or ceiling_ft is None:
@@ -168,6 +172,7 @@ def classify_flight_category(vis_m: Optional[int], ceiling_ft: Optional[int]) ->
     if vis_m >= 1500 and ceiling_ft >= 600:
         return "SVFR"
     return "IFR"
+
 
 def build_detail_text(metar_line: str, icao: str) -> str:
     if not metar_line or not metar_line.startswith(icao):
@@ -182,6 +187,7 @@ def build_detail_text(metar_line: str, icao: str) -> str:
     filtered = [p for p in body if not WIND_REGEX.match(p) and not Q_OR_A_REGEX.match(p)]
     return " ".join(filtered).strip()
 
+
 def seconds_to_next_slot(now_utc: datetime) -> int:
     m = now_utc.minute
     if m < 30:
@@ -189,6 +195,7 @@ def seconds_to_next_slot(now_utc: datetime) -> int:
     else:
         next_slot = (now_utc + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
     return max(1, int((next_slot - now_utc).total_seconds()))
+
 
 class MinimalMetarApp(tk.Tk):
     def __init__(self):
@@ -251,6 +258,7 @@ class MinimalMetarApp(tk.Tk):
                     def handler(event, ic=ic):
                         self.toggle_detail(ic)
                         return "break"
+
                     return handler
 
                 for w in (line, main, dot):
@@ -263,7 +271,7 @@ class MinimalMetarApp(tk.Tk):
                     anchor="w", justify="left", padx=0
                 )
                 self.row_detail_labels[icao] = detail
-            
+
             tk.Frame(self, height=10, bg="black").pack(fill="x")
 
     def _start_move(self, event):
@@ -277,9 +285,9 @@ class MinimalMetarApp(tk.Tk):
     def _initial_load(self):
         metars = fetch_metars(ALL_ICAOS)
         atis = fetch_atis_codes(ALL_ICAOS)
-        
+
         self.atis_codes = atis
-        
+
         for icao in ALL_ICAOS:
             full = metars.get(icao, "")
             self.metar_full[icao] = full or ""
@@ -291,7 +299,7 @@ class MinimalMetarApp(tk.Tk):
             self.category[icao] = cat
 
             parts = parse_wind_qnh(full, icao) if full else None
-            
+
             self._update_summary_and_details(icao, full, parts)
 
         if not metars:
@@ -334,7 +342,7 @@ class MinimalMetarApp(tk.Tk):
             self.summary[icao] = f"{icao} {wind} {qnh}" + (f" {atis_code}" if atis_code else "")
         else:
             self.summary[icao] = f"{icao} —"
-        
+
         det = build_detail_text(full_metar, icao)
         self.detail_text[icao] = det if det else PLACEHOLDER
 
@@ -369,9 +377,9 @@ class MinimalMetarApp(tk.Tk):
         if changed:
             self.after(0, self._apply_all)
         self.schedule_next_metar_refresh()
-        
+
     def schedule_next_atis_refresh(self):
-        delay_seconds = 5 * 60 
+        delay_seconds = 5 * 60
         self.after(delay_seconds * 1000, self.refresh_atis_now)
 
     def refresh_atis_now(self):
@@ -390,15 +398,16 @@ class MinimalMetarApp(tk.Tk):
             if self.atis_codes.get(icao) != new_atis:
                 changed = True
                 self.atis_codes[icao] = new_atis
-                
+
                 full_metar = self.metar_full.get(icao)
                 if full_metar:
                     parts = parse_wind_qnh(full_metar, icao)
                     self._update_summary_and_details(icao, full_metar, parts)
-        
+
         if changed:
             self.after(0, self._apply_all)
         self.schedule_next_atis_refresh()
+
 
 if __name__ == "__main__":
     MinimalMetarApp().mainloop()
