@@ -6,7 +6,8 @@ PocketVatsimMETAR is a lightweight, always-on desktop application designed for v
 
 ## Features
 
-- Fetches data every 30 minutes from the VATSIM network.
+- Fetches METAR data every 30 minutes from the VATSIM network.
+- Fetches ATIS data every 5 minutes from the VATSIM network.
 - Colored dots show the flight category (VFR, SVFR, IFR).
 - Left-click on any airport to view the full METAR details.
 - Right-click on the app to drag it.
@@ -15,7 +16,7 @@ PocketVatsimMETAR is a lightweight, always-on desktop application designed for v
 ## Configuration File
 
 > [!NOTE]
-> The application can be customized using a **config.json file**. This is an optional file that must be placed in the same directory as the **PocketVatsimMETAR.exe** file. If the file is not found, the application will run with default settings.
+> The application can be customized using a **config.json** file. This is an optional file that must be placed in the same directory as the **PocketVatsimMETAR.exe** file. If the file is not found, the application will run with default settings.
 
 You can use it to modify the following:
 
