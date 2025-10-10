@@ -2,7 +2,7 @@
     "ICAO_GROUPS": [
         ["EPWA", "EPMO", "EPLL", "EPRA"],
         ["EPKK", "EPKT"],
-        ["EPPO", "EPWR"],
+        ["EPPO", "EPWR", "EPZG"],
         ["EPGD", "EPBY"],
         ["EPSC", "EPSY", "EPLB", "EPRZ"]
     ],
@@ -15,3 +15,4 @@
     "FONT_FAMILY": "Courier",
     "FONT_SIZE": 8
 }
+
