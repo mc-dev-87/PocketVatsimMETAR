@@ -11,6 +11,7 @@ PocketVatsimMETAR is a lightweight, always-on desktop application designed for v
 - Colored dots show the flight category (VFR, SVFR, IFR).
 - Left-click on any airport to view the full METAR details.
 - Right-click on the app to drag it.
+- Middle-click to highlight the airport.
 - Press the Esc key to close the app.
 
 ## Configuration File
